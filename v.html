@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>التحقّق من النسخة — الإباحية: من الشذوذ إلى القتل «شهوةً»</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;600&family=Reem+Kufi:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:radial-gradient(ellipse at 50% 20%,#3a0a14,#0b0b0e 70%);color:#efe6d4;font-family:'Amiri',serif;font-size:19px;line-height:1.85;display:flex;align-items:center;justify-content:center;padding:24px}
+.box{width:100%;max-width:520px;text-align:center;background:rgba(255,255,255,.03);border:1px solid rgba(201,164,92,.25);border-radius:18px;padding:34px 26px}
+.seal{width:110px;height:110px;margin:0 auto 18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:54px;border:3px solid}
+.ok .seal{border-color:#c9a45c;color:#e2bd6c;box-shadow:0 0 40px rgba(201,164,92,.35)}
+.bad .seal{border-color:#e0324d;color:#e0324d}
+h1{font-family:'Reem Kufi';font-size:30px;line-height:1.4;color:#fff;margin-bottom:6px}
+.code{display:inline-block;margin:12px 0;font-family:'IBM Plex Sans Arabic';font-weight:600;letter-spacing:2px;font-size:20px;direction:ltr;background:#0b0b0e;border:1px solid rgba(201,164,92,.3);border-radius:10px;padding:8px 16px;color:#e2bd6c}
+p{color:#cfc4b2;font-size:17px}
+.book{margin-top:22px;padding-top:18px;border-top:1px solid rgba(201,164,92,.2);font-family:'IBM Plex Sans Arabic';font-size:14px;color:#a99c84}
+.book b{display:block;font-family:'Reem Kufi';font-size:18px;color:#efe6d4}
+input{width:100%;margin-top:14px;padding:12px;border-radius:10px;border:1px solid rgba(201,164,92,.35);background:#0b0b0e;color:#fff;font-size:18px;text-align:center;direction:ltr;letter-spacing:2px}
+button{margin-top:10px;width:100%;padding:12px;border:none;border-radius:10px;background:#9b1428;color:#fff;font-family:'IBM Plex Sans Arabic';font-weight:600;font-size:16px;cursor:pointer}
+a{color:#e2bd6c}
+</style>
+</head>
+<body>
+<div class="box" id="box"><p>جارٍ التحقّق…</p></div>
+<script>
+const BOOK='<div class="book"><b>الإباحية: من الشذوذ إلى القتل «شهوةً»</b>الباحث المهندس هلال سفرجلاني · <a href="./">صفحة الكتاب</a></div>';
+async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function ask(msg){document.getElementById('box').className='box';document.getElementById('box').innerHTML=`<h1>التحقّق من نسخة</h1><p>${msg||'أدخل رقم الترخيص المكتوب أسفل صفحات النسخة، أو امسح رمز QR.'}</p><input id="c" placeholder="FT-XXXXX-XXXXX"><button onclick="go(document.getElementById('c').value)">تحقّق</button>`+BOOK}
+async function go(raw){
+ const code=(raw||'').trim().toUpperCase();
+ if(!code){ask();return}
+ location.hash=code;
+ let list=[];try{list=await (await fetch('licenses.json',{cache:'no-store'})).json()}catch(e){}
+ const ok=list.includes(await sha(code));
+ const box=document.getElementById('box');
+ if(ok){box.className='box ok';box.innerHTML=`<div class="seal">✓</div><h1>نسخة أصلية مرخّصة من المؤلف</h1><div class="code">${code}</div><p>هذه النسخة صادرة عن المؤلف لمشترٍ واحد، ورقم ترخيصها مسجّل. جزاك الله خيراً على دعم العمل، ونرجو ألّا تُشارَك النسخة مع غيرك.</p>`+BOOK}
+ else{box.className='box bad';box.innerHTML=`<div class="seal">✕</div><h1>رقم غير مسجّل</h1><div class="code">${code.replace(/[<>&"]/g,'')}</div><p>لم نجد هذا الرقم بين النسخ المرخّصة. تأكّد من كتابته، أو احصل على نسختك الأصلية من صفحة الكتاب.</p><button onclick="ask()">جرّب رقماً آخر</button>`+BOOK}
+}
+const h=decodeURIComponent(location.hash.slice(1));h?go(h):ask();
+</script>
+</body>
+</html>
