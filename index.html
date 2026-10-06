@@ -195,15 +195,13 @@ footer{padding:36px 0;text-align:center;font-family:'IBM Plex Sans Arabic';font-
 <script>
 function cp(){const t="+96181519386";(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{const b=document.querySelector('.copy');b.textContent='تم النسخ ✓';setTimeout(()=>b.textContent='نسخ',1600)}).catch(()=>{prompt('انسخ الرقم:',t)})}
 
-// referral code: ?ref=ali  →  added to the WhatsApp message (remembered on this device for 30 days)
+// referral code: only when the visited link itself has ?ref=… (nothing is remembered)
 (function(){
+  try{localStorage.removeItem('fitra_ref');}catch(e){}
   let ref=null;
   try{ref=new URLSearchParams(location.search).get('ref');}catch(e){}
-  try{
-    if(ref){ref=ref.replace(/[^A-Za-z0-9_-]/g,'').slice(0,20).toUpperCase(); localStorage.setItem('fitra_ref',JSON.stringify({c:ref,t:Date.now()}));}
-    else{const o=JSON.parse(localStorage.getItem('fitra_ref')||'null'); if(o&&Date.now()-o.t<30*864e5) ref=o.c;}
-  }catch(e){}
   if(!ref) return;
+  ref=ref.replace(/[^A-Za-z0-9_-]/g,'').slice(0,20).toUpperCase(); if(!ref) return;
   const a=document.getElementById('wa'); if(!a) return;
   const u=new URL(a.href); const t=u.searchParams.get('text')||'';
   a.href=u.origin+u.pathname+'?text='+encodeURIComponent(t+'\n(كود: '+ref+')');
